@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Quoth the Giphy</title>
+
+  <style type="text/css">
+    
+    .item {
+    float: left;
+    margin: 0 0 10px 10px;
+}
+.clearfix {
+    overflow: auto;
+}
+  </style>
+</head>
+
+<body>
+   <form style = "margin-bottom: 10px">
+              <label for="search">Add An Animal</label>
+              <input type="search" name="search" id="search">
+              <input type="submit" value="Search" id="submit">
+            </form>
+  <button data-animal="bear">bear</button>
+  <button data-animal="fox">
+   fox
+  </button>
+  <button data-animal="cat">
+    cat
+  </button>
+  <button data-animal="dog">
+    dog
+  </button>
+  <button data-animal="bird">
+ bird
+  </button>
+  <button data-animal="rabbit">
+    rabbit
+  </button>
+  <button data-animal="cat">
+    cat
+  </button>
+  <button data-animal="ferret">
+    ferret
+  </button>
+  <button data-animal="frog">
+    frog
+  </button>
+  <button data-animal="mouse">
+    mouse
+  </button>
+  <button data-animal="alligator">
+    alligator
+  </button>
+  <button data-animal="squid">
+    squid
+  </button>
+
+  <div id="gifs-appear-here">
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    // Event listener for all button elements
+
+    $("form").submit(function(event){
+        event.preventDefault()
+        var searchVal = $("#search").val()
+         var queryURL = "http://api.giphy.com/v1/gifs/search?q=" +
+        searchVal + "&api_key=dc6zaTOxFJmzC&limit=5";
+
+          $.ajax({
+          url: queryURL,
+          method: "GET"
+        })
+        // After the data comes back from the API
+        .done(function(response) {
+          // Storing an array of results in the results variable
+             var results = response.data;
+             //adding a new button 
+             var newButton = $("<button style='margin-left:4px'>").html(searchVal)
+             $("button").last().after(newButton)
+
+          // Looping over every result item
+          for (var i = 0; i < results.length; i++) {
+
+            // Only taking action if the photo has an appropriate rating
+            if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
+              // Creating a div with the class "item"
+
+              var gifDiv = $("<div class='item'>");
+
+              // Storing the result item's rating
+              var rating = results[i].rating;
+
+              // Creating a paragraph tag with the result item's rating
+              var p = $("<p>").text("Rating: " + rating);
+
+              // Creating an image tag
+              var animalImage = $("<img data-state='still'>");
+
+              // Giving the image tag an src attribute of a proprty pulled off the
+              // result item
+              animalImage.attr("src", results[i].images.fixed_height_still.url);
+             animalImage.attr("data-animate", results[i].images.fixed_height.url)
+             animalImage.attr("data-still", results[i].images.fixed_height_still.url)
+
+
+              // Appending the paragraph and personImage we created to the "gifDiv" div we created
+
+              gifDiv.append(p);
+              gifDiv.append(animalImage);
+
+              // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
+              $("#gifs-appear-here").prepend(gifDiv);
+
+             
+    }// end if
+  }//end loop
+   
+    })//end onclick
+        $("img").on("click", function() {
+     
+              var state = $(this).attr("data-state");
+              
+              if (state === "still") {
+                $(this).attr("src", $(this).attr("data-animate"));
+                $(this).attr("data-state", "animate");
+              } else {
+                $(this).attr("src", $(this).attr("data-still"));
+                $(this).attr("data-state", "still");
+              }
+            })
+    })//end done
+
+    
+        
+
+
+
+    $("button").on("click", function(event) {
+      // In this case, the "this" keyword refers to the button that was clicked
+      event.preventDefault()
+      var animal = $(this).attr("data-animal");
+
+      // Constructing a URL to search Giphy for the name of the person who said the quote
+      var queryURL = "http://api.giphy.com/v1/gifs/search?q=" +
+        animal + "&api_key=dc6zaTOxFJmzC&limit=5";
+
+      // Performing our AJAX GET request
+      $.ajax({
+          url: queryURL,
+          method: "GET"
+        })
+        // After the data comes back from the API
+        .done(function(response) {
+          // Storing an array of results in the results variable
+          var results = response.data;
+
+          // Looping over every result item
+          for (var i = 0; i < results.length; i++) {
+
+            // Only taking action if the photo has an appropriate rating
+            if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
+              // Creating a div with the class "item"
+              var gifDiv = $("<div class='item'>");
+
+              // Storing the result item's rating
+              var rating = results[i].rating;
+
+              // Creating a paragraph tag with the result item's rating
+              var p = $("<p>").text("Rating: " + rating);
+
+              // Creating an image tag
+              var animalImage = $("<img data-state='still'>");
+
+              // Giving the image tag an src attribute of a proprty pulled off the
+              // result item
+              animalImage.attr("src", results[i].images.fixed_height_still.url);
+              animalImage.attr("data-animate", results[i].images.fixed_height.url)
+             animalImage.attr("data-still", results[i].images.fixed_height_still.url)
+
+              // Appending the paragraph and personImage we created to the "gifDiv" div we created
+              gifDiv.append(p);
+              gifDiv.append(animalImage);
+
+              // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
+              $("#gifs-appear-here").prepend(gifDiv);
+            }
+          }
+        });
+         $("img").on("click", function() {
+     
+              var state = $(this).attr("data-state");
+              
+              if (state === "still") {
+                $(this).attr("src", $(this).attr("data-animate"));
+                $(this).attr("data-state", "animate");
+              } else {
+                $(this).attr("src", $(this).attr("data-still"));
+                $(this).attr("data-state", "still");
+              }
+            })
+    });
+
+    
+  </script>
+</body>
+
+</html>
